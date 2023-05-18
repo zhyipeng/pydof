@@ -4,9 +4,13 @@ import typing
 from collections import defaultdict
 
 from loguru import logger
+from zhconv import convert
 
 from .enums import FieldType
 from .file_tree import StringTable
+
+if typing.TYPE_CHECKING:
+    from .reader import PvfReader
 
 
 @dataclasses.dataclass
@@ -21,43 +25,6 @@ class FileContentField:
         return f'\t{self.value}'
 
     __repr__ = __str__
-
-
-def parse_file_content(c: bytes,
-                       string_table: StringTable,
-                       string_quote: str = '') -> list[FileContentField]:
-    shift = 2
-    unit_num = (len(c) - 2) // 5
-    struct_pattern = '<'
-    unit_types = []
-    for i in range(unit_num):
-        unit_type = c[i * 5 + shift]
-        unit_types.append(unit_type)
-        if unit_type == 4:
-            struct_pattern += 'Bf'
-        else:
-            struct_pattern += 'Bi'
-
-    units = struct.unpack(struct_pattern, c[2:2 + 5 * unit_num])
-    types = units[::2]
-    values = units[1::2]
-    fields = []
-    for i in range(unit_num):
-        match types[i]:
-            case 2 | 3 | 4:
-                fields.append(FileContentField(types[i], values[i]))
-            case 5 | 6 | 8:
-                fields.append(FileContentField(types[i], string_table[values[i]]))
-            case 7:
-                fields.append(FileContentField(
-                    types[i],
-                    string_quote + string_table[values[i]] + string_quote
-                ))
-            case 9:
-                # TODO: handle 9
-                fields.append(FileContentField(types[i], values[i]))
-
-    return fields
 
 
 @dataclasses.dataclass
@@ -79,8 +46,8 @@ class Parser:
         self.fields: dict[str, list[ReadableField]] = defaultdict(list)
 
     @classmethod
-    def parse(cls, c: bytes, string_table: 'StringTable') -> 'Parser':
-        fields = parse_file_content(c, string_table)
+    def parse(cls, c: bytes, pvf: 'PvfReader') -> 'Parser':
+        fields = pvf.parse_file_content(c)
         parser = cls()
         parser._parse(fields)
         return parser
@@ -137,7 +104,6 @@ class LstParser:
                  encode: str = 'big5'):
         # 代码: 路径
         self.data = data
-        self.cache = {}
         self.encode = encode
 
     @classmethod
@@ -173,3 +139,27 @@ class LstParser:
 
     def items(self) -> typing.ItemsView[int, str]:
         return self.data.items()
+
+
+class StrParser:
+
+    def __init__(self, data: dict[str, str]):
+        self.data = data
+
+    @classmethod
+    def parser(cls, content: bytes, encode: str = 'big5') -> 'StrParser':
+        s = content.decode(encode, 'ignore')
+        c = convert(s, 'zh-cn')
+        data = {}
+        for line in c.splitlines():
+            if '>' not in line:
+                continue
+            k, v = line.split('>', 1)
+            data[k] = v
+        return cls(data)
+
+    def __getitem__(self, item):
+        ret = self.data.get(item)
+        if ret is not None:
+            return ret.replace('\r', '')
+        return 'None'

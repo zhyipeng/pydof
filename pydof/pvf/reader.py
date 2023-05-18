@@ -1,3 +1,5 @@
+import struct
+from functools import lru_cache
 from pathlib import Path
 from typing import BinaryIO
 
@@ -7,6 +9,7 @@ from loguru import logger
 from .file_tree import FileTreeNode, StringTable
 from .header import PvfHeader
 from .utils import decrypt_bytes
+from .parser import FileContentField, LstParser, StrParser
 
 
 class PvfReader:
@@ -22,6 +25,7 @@ class PvfReader:
 
         self.files_map: dict[str, FileTreeNode] = {}
         self.string_table: StringTable = None
+        self._n_string: LstParser = None
 
     def read(self):
         logger.info(f'Reading PVF {self.path}...')
@@ -44,6 +48,17 @@ class PvfReader:
         self.string_table = StringTable(b, self.encode)
         logger.info('String table loaded. {} strings found.', len(self.string_table))
 
+    def load_n_string(self):
+        c = self.read_file_content('n_string.lst')
+        self._n_string = LstParser.parse(c, self.string_table, self.encode)
+
+    @property
+    def n_string(self) -> LstParser:
+        if self._n_string is None:
+            self.load_n_string()
+        return self._n_string
+
+    @lru_cache(maxsize=50)
     def read_file_content(self, path: str) -> bytes:
         path = path.lower().replace('\\', '/')
         path.removeprefix('/')
@@ -59,6 +74,45 @@ class PvfReader:
             raise RuntimeError('File not opened.')
         self._fp.seek(self._fp_start + start)
         return self._fp.read(length)
+
+    def parse_file_content(self,
+                           c: bytes,
+                           string_quote: str = '') -> list[FileContentField]:
+        shift = 2
+        unit_num = (len(c) - 2) // 5
+        struct_pattern = '<'
+        unit_types = []
+        for i in range(unit_num):
+            unit_type = c[i * 5 + shift]
+            unit_types.append(unit_type)
+            if unit_type == 4:
+                struct_pattern += 'Bf'
+            else:
+                struct_pattern += 'Bi'
+
+        units = struct.unpack(struct_pattern, c[2:2 + 5 * unit_num])
+        types = units[::2]
+        values = units[1::2]
+        fields = []
+        for i in range(unit_num):
+            match types[i]:
+                case 2 | 3 | 4:
+                    fields.append(FileContentField(types[i], values[i]))
+                case 5 | 6 | 8:
+                    fields.append(FileContentField(types[i], self.string_table[values[i]]))
+                case 7:
+                    fields.append(FileContentField(
+                        types[i],
+                        string_quote + self.string_table[values[i]] + string_quote
+                    ))
+                case 9:
+                    p = self.n_string[values[i]].lower()
+                    str_c = self.read_file_content(p)
+                    parser = StrParser.parser(str_c, self.encode)
+                    v = parser[self.string_table[values[i+1]]]
+                    fields.append(FileContentField(types[i], v))
+
+        return fields
 
 
 class AsyncPvfReader(PvfReader):
