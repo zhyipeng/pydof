@@ -25,13 +25,14 @@ class PvfReader:
 
         self.files_map: dict[str, FileTreeNode] = {}
         self.string_table: StringTable = None
-        self._n_string: LstParser = None
+        self.n_string: LstParser = None
 
     def read(self):
         logger.info(f'Reading PVF {self.path}...')
         self._fp, self._fp_start = self.header.read()
         self.load_file_tree()
         self.load_string_table()
+        self.load_n_string()
         if not self.lazy:
             self._fp.seek(self._fp_start)
             self._file_data = self._fp.read()
@@ -49,14 +50,10 @@ class PvfReader:
         logger.info('String table loaded. {} strings found.', len(self.string_table))
 
     def load_n_string(self):
+        logger.info('Loading n string ...')
         c = self.read_file_content('n_string.lst')
-        self._n_string = LstParser.parse(c, self.string_table, self.encode)
-
-    @property
-    def n_string(self) -> LstParser:
-        if self._n_string is None:
-            self.load_n_string()
-        return self._n_string
+        self.n_string = LstParser.parse(c, self.string_table, self.encode)
+        logger.info('NString loaded.')
 
     @lru_cache(maxsize=50)
     def read_file_content(self, path: str) -> bytes:
