@@ -3,3 +3,5 @@
 test.py
 *.log
 venv
+*.pyc
+__pycache__

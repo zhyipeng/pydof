@@ -84,8 +84,12 @@ class Parser:
     def get_field(self, key: str) -> list[ReadableField]:
         return self.fields[key]
 
-    def get_field_value(self, key: str) -> list[int | str | float]:
+    def get_field_value(self, key: str) -> list[int | str | float] | None:
         fields = self.get_field(key)
+        if not fields:
+            return None
+        if len(fields) == 1:
+            return fields[0].value
         return [f.value for f in fields]
 
     def get_simple_field_value(self, key: str):
