@@ -97,21 +97,3 @@ class NPK:
     @property
     def files(self) -> list[File]:
         return self._files
-
-    def extra_images(self, out: os.PathLike):
-        from pydof.npk import IMGFactory
-
-        out = Path(out)
-        if not out.exists():
-            out.mkdir(parents=True)
-
-        for file in self._files:
-            dirpath = out / file.name
-            if not dirpath.exists():
-                dirpath.mkdir(parents=True)
-
-            img = IMGFactory.open(io.BytesIO(file.data))
-            for i, _img in enumerate(img.images):
-                pil_image = img.build(_img)
-                with (dirpath / f'{i}.png').open('wb') as fp:
-                    pil_image.save(fp)
