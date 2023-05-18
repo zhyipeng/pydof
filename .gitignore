@@ -1,0 +1,8 @@
+.idea
+.vscode
+test.py
+*.log
+venv
+*.pyc
+__pycache__
+out
