@@ -119,6 +119,7 @@ class AsyncPvfReader(PvfReader):
         self._fp, self._fp_start = await self.header.aread()
         self.load_file_tree()
         await self.load_string_table()
+        await self.load_n_string()
         if not self.lazy:
             await self._fp.seek(self._fp_start)
             self._file_data = await self._fp.read()
@@ -154,3 +155,9 @@ class AsyncPvfReader(PvfReader):
         b = await self.read_file_content('stringtable.bin')
         self.string_table = StringTable(b, self.encode)
         logger.info('String table loaded. {} strings found.', len(self.string_table))
+
+    async def load_n_string(self):
+        logger.info('Loading n string ...')
+        c = await self.read_file_content('n_string.lst')
+        self.n_string = LstParser.parse(c, self.string_table, self.encode)
+        logger.info('NString loaded.')
