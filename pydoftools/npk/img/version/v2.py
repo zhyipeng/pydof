@@ -1,7 +1,7 @@
 import typing
 
-from pydof.npk.consts import IMAGE_EXTRA_ZLIB_SPRITE, IMG_MAGIC, IMG_VERSION_2
-from pydof.utils.io import write_ascii_string, write_struct
+from pydoftools.npk.consts import IMAGE_EXTRA_ZLIB_SPRITE, IMG_MAGIC, IMG_VERSION_2
+from pydoftools.utils.io import write_ascii_string, write_struct
 from .v1 import IMGv1
 from ..image import ImageFactory, ImageLink, SpriteZlibImage, ZlibImage
 

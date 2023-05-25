@@ -4,7 +4,7 @@ import os
 import typing
 from pathlib import Path
 
-from pydof.npk import IMGFactory, NPK
+from pydoftools.npk import IMGFactory, NPK
 
 
 def extra_images(npk: NPK, out: os.PathLike):

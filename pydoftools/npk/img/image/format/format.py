@@ -3,7 +3,7 @@ from io import BytesIO
 
 from PIL import Image as PILImage
 
-from pydof.utils.io import read_range
+from pydoftools.utils.io import read_range
 
 
 class Format:

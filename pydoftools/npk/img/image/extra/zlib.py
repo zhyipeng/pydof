@@ -1,8 +1,8 @@
 import typing
 import zlib
 
-from pydof.npk.consts import IMAGE_EXTRA_ZLIB
-from pydof.utils.zlib import zlib_decompress
+from pydoftools.npk.consts import IMAGE_EXTRA_ZLIB
+from pydoftools.utils.zlib import zlib_decompress
 from ..image import Image
 
 

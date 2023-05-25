@@ -1,8 +1,8 @@
 import typing
 from io import SEEK_CUR
 
-from pydof.npk.consts import IMG_MAGIC_OLD
-from pydof.utils.io import write_ascii_string, write_struct
+from pydoftools.npk.consts import IMG_MAGIC_OLD
+from pydoftools.utils.io import write_ascii_string, write_struct
 from .img import IMG
 from ..image import ImageFactory, ImageLink
 

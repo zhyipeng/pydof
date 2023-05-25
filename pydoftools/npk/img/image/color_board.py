@@ -1,6 +1,6 @@
 import typing
 
-from pydof.utils.io import read_struct, write_struct
+from pydoftools.utils.io import read_struct, write_struct
 
 
 class ColorBoard:

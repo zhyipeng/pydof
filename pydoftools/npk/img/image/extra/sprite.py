@@ -1,7 +1,7 @@
 import typing
 
-from pydof.npk.consts import IMAGE_EXTRA_ZLIB_SPRITE
-from pydof.utils.io import read_struct, write_struct
+from pydoftools.npk.consts import IMAGE_EXTRA_ZLIB_SPRITE
+from pydoftools.utils.io import read_struct, write_struct
 from ..image import Image
 
 

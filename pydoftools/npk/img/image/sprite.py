@@ -1,10 +1,10 @@
 import typing
 import zlib
 
-from pydof.npk.consts import IMAGE_FORMATS_DDS
-from pydof.utils import image as image_util
-from pydof.utils.io import read_range, read_struct, write_struct
-from pydof.utils.zlib import zlib_decompress
+from pydoftools.npk.consts import IMAGE_FORMATS_DDS
+from pydoftools.utils import image as image_util
+from pydoftools.utils.io import read_range, read_struct, write_struct
+from pydoftools.utils.zlib import zlib_decompress
 from .format import FormatConvertor
 
 

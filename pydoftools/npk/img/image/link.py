@@ -1,8 +1,7 @@
-import os
 import typing
 
-from pydof.npk.consts import IMAGE_FORMAT_LINK
-from pydof.utils.io import read_struct, write_struct
+from pydoftools.npk.consts import IMAGE_FORMAT_LINK
+from pydoftools.utils.io import read_struct, write_struct
 
 if typing.TYPE_CHECKING:
     from .image import Image

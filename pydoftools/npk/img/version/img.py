@@ -2,8 +2,8 @@ import typing
 
 from PIL import Image as PILImage
 
-from pydof.utils.image import load_raw
-from pydof.utils.io import read_struct, write_struct
+from pydoftools.utils.image import load_raw
+from pydoftools.utils.io import read_struct, write_struct
 from ..image import (FormatConvertor, Image, ImageLink, SpriteZlibImage,
                      ZlibImage)
 

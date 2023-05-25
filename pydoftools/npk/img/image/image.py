@@ -1,9 +1,9 @@
 import os
 import typing
 
-from pydof.npk.consts import *
-from pydof.utils import image as image_util
-from pydof.utils.io import read_range, read_struct, write_struct
+from pydoftools.npk.consts import *
+from pydoftools.utils import image as image_util
+from pydoftools.utils.io import read_range, read_struct, write_struct
 from .exception import ImageExtraException
 from .format import FormatConvertor
 

@@ -1,7 +1,7 @@
 import typing
 
-from pydof.npk.consts import *
-from pydof.utils.io import read_ascii_string, read_struct
+from pydoftools.npk.consts import *
+from pydoftools.utils.io import read_ascii_string, read_struct
 from .img import IMG
 from .v1 import IMGv1
 from .v2 import IMGv2

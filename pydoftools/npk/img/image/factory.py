@@ -1,7 +1,7 @@
 import typing
 
-from pydof.npk.consts import *
-from pydof.utils.io import read_struct
+from pydoftools.npk.consts import *
+from pydoftools.utils.io import read_struct
 from .exception import *
 from .extra import SpriteZlibImage, ZlibImage
 from .image import Image

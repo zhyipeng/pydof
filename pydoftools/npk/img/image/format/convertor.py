@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from pydof.utils.io import read_range, read_struct, write_struct
+from pydoftools.utils.io import read_range, read_struct, write_struct
 from .factory import FormatFactory
 
 

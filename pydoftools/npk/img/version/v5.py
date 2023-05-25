@@ -2,7 +2,7 @@ import typing
 
 from PIL import Image as PILImage
 
-from pydof.utils.io import read_struct, write_struct
+from pydoftools.utils.io import read_struct, write_struct
 from .v4 import IMGv4
 from ..image import Image, Sprite, SpriteZlibImage
 

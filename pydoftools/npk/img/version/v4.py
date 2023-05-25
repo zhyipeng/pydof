@@ -1,7 +1,7 @@
 import typing
 
-from pydof.npk.consts import IMAGE_EXTRA_ZLIB
-from pydof.utils.image import load_raw
+from pydoftools.npk.consts import IMAGE_EXTRA_ZLIB
+from pydoftools.utils.image import load_raw
 from .v2 import IMGv2
 from ..image import ColorBoard, FormatConvertor
 
