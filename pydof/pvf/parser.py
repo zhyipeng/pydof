@@ -44,6 +44,7 @@ class Parser:
 
     def __init__(self):
         self.fields: dict[str, list[ReadableField]] = defaultdict(list)
+        self.origin: list[FileContentField] = []
 
     @classmethod
     def parse(cls, c: bytes, pvf: 'PvfReader') -> 'Parser':
@@ -53,6 +54,46 @@ class Parser:
         return parser
 
     def _parse(self, fields: list[FileContentField]):
+        self.fields = defaultdict(list)
+        self.origin = fields
+        closing_key = set()
+        for f in fields:
+            if f.tp == FieldType.KEY.value and f.value.startswith('[/'):
+                closing_key.add(f.value[2:-1])
+
+        key: str | None = None
+        values = []
+        for f in fields:
+            if f.tp == FieldType.KEY.value:
+                if key is None:
+                    key = f.value[1:-1]
+                else:
+                    is_close = f.value.startswith('[/')
+                    if key in closing_key:
+                        if is_close and f.value[2:-1] == key:
+                            self.fields[key].append(ReadableField(
+                                key=key,
+                                values=values,
+                                self_closing=True
+                            ))
+                            values = []
+                            key = None
+                        else:
+                            values.append(f)
+                    else:
+                        self.fields[key].append(ReadableField(
+                            key=key,
+                            values=values,
+                        ))
+                        values = []
+                        if f.value.startswith('[/'):
+                            key = None
+                        else:
+                            key = f.value[1:-1]
+            else:
+                values.append(f)
+
+    def __parse(self, fields: list[FileContentField]):
         key: str = None
         values: list[FileContentField] = None
         for f in fields:
