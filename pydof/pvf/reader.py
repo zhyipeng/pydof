@@ -1,4 +1,5 @@
 import struct
+import typing
 from functools import lru_cache
 from pathlib import Path
 from typing import BinaryIO
@@ -12,9 +13,17 @@ from .utils import decrypt_bytes
 from .parser import FileContentField, LstParser, StrParser
 
 
+def fake_tqdm(g: typing.Iterable, **kwargs):
+    return g
+
+
 class PvfReader:
 
-    def __init__(self, path: Path, encode: str = 'big5', lazy: bool = True):
+    def __init__(self,
+                 path: Path,
+                 encode: str = 'big5',
+                 lazy: bool = True,
+                 use_tqdm=False):
         self.path = path
         self.header = PvfHeader(path)
         self.lazy = lazy
@@ -26,6 +35,13 @@ class PvfReader:
         self.files_map: dict[str, FileTreeNode] = {}
         self.string_table: StringTable = None
         self.n_string: LstParser = None
+        self.tqdm = fake_tqdm
+        if use_tqdm:
+            try:
+                from tqdm import tqdm
+                self.tqdm = tqdm
+            except ImportError:
+                logger.warning('tqdm not found, use_tqdm will be ignored.')
 
     def read(self):
         logger.info(f'Reading PVF {self.path}...')
@@ -39,7 +55,7 @@ class PvfReader:
 
     def load_file_tree(self):
         logger.info('Loading file tree...')
-        for f in self.header.load_file_tree():
+        for f in self.tqdm(self.header.load_file_tree(), total=self.header.file_count):
             self.files_map[f.file_path] = f
         logger.info('File tree loaded. {} files found.', len(self.files_map))
 
