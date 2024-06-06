@@ -1,9 +1,13 @@
 import hashlib
+import io
 import typing
 
 from .consts import NPK_FILENAME_DECORD_FLAG
 from ..utils.io import read_range, read_struct, write_struct
 from ..utils.zlib import zfill_bytes
+
+if typing.TYPE_CHECKING:
+    from .img.version.img import IMG
 
 
 class File:
@@ -100,3 +104,7 @@ class File:
 
         result = bytes(result_list)
         return result
+
+    def to_img(self) -> 'IMG':
+        from . import IMGFactory
+        return IMGFactory.open(io.BytesIO(self.data))

@@ -1,6 +1,6 @@
 import typing
 
-from PIL import Image as PILImage
+from PIL.Image import Image as PILImage
 
 from pydoftools.utils.image import load_raw
 from pydoftools.utils.io import read_struct, write_struct
